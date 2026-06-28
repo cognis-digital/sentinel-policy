@@ -6,7 +6,13 @@
 
 **An open governance doctrine for AI agents — the SENTINEL seven rules — plus a file-backed policy-gate engine that decides allow / deny / require-approval, each decision citing the rule it serves.**
 
-"Responsible AI" means nothing until it's written down as rules you can argue with. `sentinel-policy` publishes a concrete doctrine openly (Apache-2.0) and ships a small engine that enforces it from a plain JSON policy file — no DSL, no `eval`, no runtime dependency.
+Ask yourself:
+
+- Has anyone asked what your AI agents are actually *allowed* to do — and you pointed at a slide, not a file?
+- When an action is blocked, can you name **which rule** blocked it, and why?
+- Could an auditor read your governance rules and **argue with them** before trusting your agents?
+
+"Responsible AI" means nothing until it's written down as rules you can enforce. `sentinel-policy` publishes a concrete doctrine openly (Apache-2.0) and ships a small engine that enforces it from a plain JSON policy file — no DSL, no `eval`, no runtime dependency.
 
 ## The SENTINEL doctrine
 
