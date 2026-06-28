@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "name": "prod-controls",
+  "default": "deny",
+  "rules": [
+    {
+      "id": "reads-are-fine",
+      "doctrine": "S2",
+      "effect": "allow",
+      "match": { "action": "read.*" }
+    },
+    {
+      "id": "gate-prod-deploy",
+      "doctrine": "S3",
+      "effect": "require_approval",
+      "tier": "high",
+      "match": { "action": "deploy", "params.env": { "eq": "prod" } },
+      "reason": "production deploys require a separate change-control approval"
+    },
+    {
+      "id": "approve-irreversible",
+      "doctrine": "S5",
+      "effect": "require_approval",
+      "tier": "high",
+      "match": { "params.irreversible": { "eq": true } },
+      "reason": "irreversible actions need explicit acknowledgement"
+    },
+    {
+      "id": "no-cross-boundary-export",
+      "doctrine": "S6",
+      "effect": "deny",
+      "match": { "action": "*export*" },
+      "reason": "data may not cross a tenant/classification boundary without explicit authorization"
+    },
+    {
+      "id": "allow-nonprod",
+      "doctrine": "S2",
+      "effect": "allow",
+      "match": { "params.env": { "in": ["dev", "staging", "test"] } }
+    }
+  ]
+}
