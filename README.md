@@ -1,5 +1,7 @@
 # sentinel-policy
 
+[![CI](https://github.com/cognis-digital/sentinel-policy/actions/workflows/ci.yml/badge.svg)](https://github.com/cognis-digital/sentinel-policy/actions/workflows/ci.yml)
+
 **An open governance doctrine for AI agents — the SENTINEL seven rules — plus a file-backed policy-gate engine that decides allow / deny / require-approval, each decision citing the rule it serves.**
 
 "Responsible AI" means nothing until it's written down as rules you can argue with. `sentinel-policy` publishes a concrete doctrine openly (Apache-2.0) and ships a small engine that enforces it from a plain JSON policy file — no DSL, no `eval`, no runtime dependency.
