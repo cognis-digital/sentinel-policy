@@ -12,7 +12,7 @@ Ask yourself:
 - When an action is blocked, can you name **which rule** blocked it, and why?
 - Could an auditor read your governance rules and **argue with them** before trusting your agents?
 
-"Responsible AI" means nothing until it's written down as rules you can enforce. `sentinel-policy` publishes a concrete doctrine openly (Apache-2.0) and ships a small engine that enforces it from a plain JSON policy file — no DSL, no `eval`, no runtime dependency.
+"Responsible AI" means nothing until it's written down as rules you can enforce. `sentinel-policy` publishes a concrete doctrine openly (COCL (Cognis Open Collaboration License)) and ships a small engine that enforces it from a plain JSON policy file — no DSL, no `eval`, no runtime dependency.
 
 ## The SENTINEL doctrine
 
@@ -93,15 +93,51 @@ decision, entry = rec.submit("alice", "deploy", {"env": "prod"})   # gated + rec
 
 `as_gate_evaluator(defer_on_default=True)` instead returns `None` on the default branch, letting a host gate's own rules take over — so you can layer an org-wide doctrine above a team policy.
 
+## Demos
+
+Five runnable scenarios in [`demos/`](demos/), each for a different audience and
+using only the real public API — no network, narrated output, every one exits 0.
+See [`docs/DEMOS.md`](docs/DEMOS.md) for the long form and
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the evaluate → verdict flow.
+
+```bash
+# Windows console is cp1252; force UTF-8 so the output renders cleanly.
+PYTHONUTF8=1 python demos/run_all.py                       # all five
+PYTHONUTF8=1 python demos/02_security_least_authority.py   # or just one
+```
+
+| # | Demo | Audience | What it shows |
+|---|------|----------|----------------|
+| 1 | [`01_agent_builder_gate.py`](demos/01_agent_builder_gate.py) | AI-agent builders | Gate each intended action; obey the allow / deny / require-approval verdict, each citing its rule. |
+| 2 | [`02_security_least_authority.py`](demos/02_security_least_authority.py) | Security engineers | Scope an agent to one tenant, gate secrets by priority, deny cross-tenant reads. |
+| 3 | [`03_compliance_doctrine_coverage.py`](demos/03_compliance_doctrine_coverage.py) | Compliance & audit | Map every rule to the principle it cites; report doctrine coverage. |
+| 4 | [`04_platform_layered_policies.py`](demos/04_platform_layered_policies.py) | Platform engineers | Layer an org doctrine above a team policy via `as_gate_evaluator`. |
+| 5 | [`05_provable_refusal_log.py`](demos/05_provable_refusal_log.py) | Safety / SRE | Provable Refusal (S7): a structured record for every directive, no silent denials. |
+
+```mermaid
+flowchart LR
+    dir[Directive<br/>actor + action + params] --> ev[Policy.evaluate]
+    pol[(Policy file<br/>JSON)] --> ev
+    ev --> m{first matching rule?}
+    m -- yes --> rd[rule decision]
+    m -- no --> df[policy default]
+    rd --> dec[Decision<br/>effect · rule · doctrine · reason]
+    df --> dec
+    dec --> a{effect}
+    a -- allow --> go[proceed]
+    a -- deny --> stop[refused, recorded]
+    a -- require_approval --> gate[held for approval]
+```
+
 ## Testing
 
 ```bash
 pip install -e ".[dev]"
-pytest -q          # 18 tests
+pytest -q          # 24 tests
 ```
 
 ## License
 
-Apache-2.0. © Cognis Digital. The doctrine is published openly on purpose — fork it, argue with it, tighten it for your regulators.
+COCL (Cognis Open Collaboration License). © Cognis Digital. The doctrine is published openly on purpose — fork it, argue with it, tighten it for your regulators.
 
 > Status: v0.1 — runnable and tested. Roadmap: policy composition/inheritance, time-windowed and rate-based conditions, a signed-policy loader (verify a policy file's provenance before enforcing it), and a test harness for asserting doctrine coverage.
