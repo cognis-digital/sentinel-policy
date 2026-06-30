@@ -58,7 +58,14 @@ diff, and sign without executing anything.
   truthy) and `as_dict()`.
 - **`Policy`** — holds the sorted rules and default; `evaluate(directive)`
   returns a `Decision`; `validate()` reports problems (duplicate ids, unknown
-  doctrine references, unknown operators) for `sentinel lint`.
+  doctrine references, unknown/typed-wrong operators, `require_approval` with no
+  tier, non-object match) for `sentinel lint`; `doctrine_coverage()` reports
+  which of the seven principles the policy actually enforces (`covered` /
+  `uncovered` / `by_rule`) for `sentinel coverage`.
+- **`PolicyError`** — a `ValueError` subclass raised by `Policy.from_dict` /
+  `load_policy` when a policy is malformed, with a message that names the
+  offending rule and field. A governance gate never silently loads a
+  half-broken policy.
 - **`as_gate_evaluator(defer_on_default=...)`** — returns a `Callable` for
   composition. With `defer_on_default=True` it returns `None` when only the
   default applied, letting a host gate decide — so you can stack an org doctrine
@@ -67,8 +74,11 @@ diff, and sign without executing anything.
 
 ### CLI (`sentinel_policy/cli.py`)
 `sentinel doctrine` prints the seven rules; `sentinel lint POLICY.json`
-validates a file; `sentinel eval POLICY.json --action … --param k=v` evaluates a
-directive and prints the decision as JSON (exit 0 if allowed, 2 otherwise).
+validates a file; `sentinel coverage POLICY.json [--json]` reports doctrine
+coverage; `sentinel eval POLICY.json --action … --param k=v` evaluates a
+directive and prints the decision as JSON (exit 0 if allowed, 2 otherwise). A
+load error (missing file, bad JSON, malformed policy) prints a clean
+`error: …` message and exits non-zero — never a traceback.
 
 ## Composability
 

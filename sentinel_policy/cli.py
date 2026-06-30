@@ -13,7 +13,18 @@ import sys
 
 from . import __version__
 from .doctrine import DOCTRINE
-from .policy import load_policy
+from .policy import PolicyError, load_policy
+
+
+def _load_or_exit(path: str):
+    """Load a policy, turning load errors into a clean message + exit code 2
+    instead of a traceback."""
+    try:
+        return load_policy(path)
+    except FileNotFoundError as exc:
+        raise SystemExit(f"error: {exc}")
+    except PolicyError as exc:
+        raise SystemExit(f"error: {exc}")
 
 
 def _parse_params(pairs):
@@ -45,7 +56,7 @@ def cmd_doctrine(_args) -> int:
 
 
 def cmd_lint(args) -> int:
-    policy = load_policy(args.policy)
+    policy = _load_or_exit(args.policy)
     problems = policy.validate()
     if problems:
         print(f"INVALID: {args.policy}")
@@ -56,8 +67,24 @@ def cmd_lint(args) -> int:
     return 0
 
 
+def cmd_coverage(args) -> int:
+    policy = _load_or_exit(args.policy)
+    cov = policy.doctrine_coverage()
+    if args.json:
+        print(json.dumps(cov, indent=2))
+        return 0
+    print(f"Doctrine coverage for {args.policy}:")
+    for rid, doc in cov["by_rule"].items():
+        print(f"  {rid:<28} -> {doc or '(uncited)'}")
+    print(f"\n  covered  : {', '.join(cov['covered']) or '(none)'}")
+    print(f"  uncovered: {', '.join(cov['uncovered']) or '(none)'}")
+    print(f"  {len(cov['covered'])}/{len(cov['covered']) + len(cov['uncovered'])} "
+          f"SENTINEL principles enforced")
+    return 0
+
+
 def cmd_eval(args) -> int:
-    policy = load_policy(args.policy)
+    policy = _load_or_exit(args.policy)
     directive = {
         "actor": args.actor,
         "action": args.action,
@@ -79,6 +106,11 @@ def build_parser() -> argparse.ArgumentParser:
     pl = sub.add_parser("lint", help="validate a policy file")
     pl.add_argument("policy")
     pl.set_defaults(func=cmd_lint)
+
+    pc = sub.add_parser("coverage", help="report doctrine coverage of a policy")
+    pc.add_argument("policy")
+    pc.add_argument("--json", action="store_true", help="emit JSON")
+    pc.set_defaults(func=cmd_coverage)
 
     pe = sub.add_parser("eval", help="evaluate a directive against a policy")
     pe.add_argument("policy")
