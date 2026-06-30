@@ -14,11 +14,11 @@ Two things ship here:
 """
 
 from .doctrine import DOCTRINE, Rule, rule
-from .policy import Decision, Effect, Policy, load_policy
+from .policy import Decision, Effect, Policy, PolicyError, load_policy
 
 __version__ = "0.1.0"
 __all__ = [
     "DOCTRINE", "Rule", "rule",
-    "Policy", "Decision", "Effect", "load_policy",
+    "Policy", "Decision", "Effect", "PolicyError", "load_policy",
     "__version__",
 ]
