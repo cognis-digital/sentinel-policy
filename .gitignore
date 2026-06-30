@@ -7,3 +7,5 @@ build/
 dist/
 .venv/
 venv/
+
+media/walkthrough.mp4
