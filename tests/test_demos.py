@@ -18,6 +18,12 @@ SCENARIOS = [
     "03_compliance_doctrine_coverage",
     "04_platform_layered_policies",
     "05_provable_refusal_log",
+    "21_new_condition_operators",
+    "22_explain_trace",
+    "23_policy_diff",
+    "24_audit_replay",
+    "25_rate_limit",
+    "26_ci_gate_and_export",
 ]
 
 
